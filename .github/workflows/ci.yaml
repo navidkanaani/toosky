@@ -1,0 +1,15 @@
+name: Toosky-CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python version ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+      - run: python -c "print('Hello GH workflows!')"
