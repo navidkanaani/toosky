@@ -3,7 +3,7 @@ name: Toosky-CI
 on: [push]
 
 jobs:
-  test:
+  running_tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
