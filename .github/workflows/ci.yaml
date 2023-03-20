@@ -13,6 +13,7 @@ jobs:
       - name: Set up Python version ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
       - run: python -c "print('Python is alive here in this machine!')"
       - name: Installing requirements
