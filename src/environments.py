@@ -7,20 +7,16 @@ class EnvMeta(type):
 
 
 class Env(metaclass=EnvMeta):
-    env_file_path = ".env"
-    keys = (
-        'TEST_DB_NAME',
-    )
 
     def __new__(cls, *args, **kwargs):
         raise Exception(
-            "This class must not be instantiated."
+            "This class can not be instantiated."
         )
 
     @classmethod
-    def _init_envs_(cls, env_file_path=None, keys=None):
-        envs = dotenv.dotenv_values(env_file_path or cls.env_file_path)
-        cls._envs_dict = {}
-        for key in keys or cls.keys:
-            cls._envs_dict[key] = envs[key]
-
+    def _init_envs_(cls, env_file_path):
+        import pathlib
+        if not pathlib.Path(env_file_path).is_file():
+            raise FileNotFoundError
+        envs = dotenv.dotenv_values(env_file_path)
+        cls._envs_dict = {**envs}
