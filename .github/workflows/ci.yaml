@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set up Python version ${{ matrix.python-version }}
         uses: actions/setup-python@v4
+        with:
+          cache: 'pip'
       - run: python -c "print('Python is alive here in this machine!')"
       - name: Installing requirements
         run: |
