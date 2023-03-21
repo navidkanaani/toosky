@@ -1,7 +1,9 @@
 from src.api import app
+from src.environments import Env
+
 
 def main():
-    app.run(host="127.0.0.1", port=5000)
+    app.run(host=Env.HOST, port=Env.PORT)
 
 if __name__ == '__main__':
     main()
