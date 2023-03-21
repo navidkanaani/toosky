@@ -1,8 +1,7 @@
+from src.api import app
 
 def main():
-    raise NotImplementedError(
-        "Work in progress..."
-    )
+    app.run(host="127.0.0.1", port=5000)
 
 if __name__ == '__main__':
     main()
