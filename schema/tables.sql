@@ -1,3 +1,5 @@
+BEGIN;
+
 CREATE TABLE ClauseTable (
     /*
         inclusion_type 0 => include
@@ -32,3 +34,5 @@ CREATE TABLE NodeRelationTable (
     FOREIGN KEY (parent_id) REFERENCES NodeTable(rowid),
     FOREIGN KEY (child_id) REFERENCES NodeTable(rowid)
 );
+
+COMMIT;
