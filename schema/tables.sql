@@ -1,6 +1,12 @@
 BEGIN;
 
-CREATE TABLE ClauseTable (
+-- DROP TABLE IF EXISTS ClauseTable;
+-- DROP TABLE IF EXISTS WordTable;
+-- DROP TABLE IF EXISTS NodeTable;
+-- DROP TABLE IF EXISTS NodeRelationTable;
+
+
+CREATE TABLE IF NOT EXISTS ClauseTable (
     /*
         inclusion_type 0 => include
         inclusion_type 1 => exclude
@@ -18,17 +24,17 @@ CREATE TABLE ClauseTable (
     FOREIGN KEY (node_id) REFERENCES NodeTable(rowid)
 );
 
-CREATE TABLE WordTable (
+CREATE TABLE IF NOT EXISTS WordTable (
     word VARCHAR(255),
     clause_id INTEGER,
     FOREIGN KEY (clause_id) REFERENCES ClauseTable(rowid)
 );
 
-CREATE TABLE NodeTable (
+CREATE TABLE IF NOT EXISTS NodeTable (
     node_name VARCHAR(255)
 );
 
-CREATE TABLE NodeRelationTable (
+CREATE TABLE IF NOT EXISTS NodeRelationTable (
     parent_id INTEGER,
     child_id INTEGER,
     FOREIGN KEY (parent_id) REFERENCES NodeTable(rowid),
