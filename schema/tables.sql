@@ -19,24 +19,24 @@ CREATE TABLE IF NOT EXISTS ClauseTable (
     threshold_type INTEGER CHECK(threshold_type in (0, 1)),
     threshold_value INTEGER,
 
-    node_id INTEGER,
+    node_id INTEGER NOT NULL,
     
     FOREIGN KEY (node_id) REFERENCES NodeTable(rowid)
 );
 
 CREATE TABLE IF NOT EXISTS WordTable (
-    word VARCHAR(255),
+    word VARCHAR(255) NOT NULL,
     clause_id INTEGER,
     FOREIGN KEY (clause_id) REFERENCES ClauseTable(rowid)
 );
 
 CREATE TABLE IF NOT EXISTS NodeTable (
-    node_name VARCHAR(255)
+    node_name VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS NodeRelationTable (
-    parent_id INTEGER,
-    child_id INTEGER,
+    parent_id INTEGER NOT NULL,
+    child_id INTEGER NOT NULL,
     FOREIGN KEY (parent_id) REFERENCES NodeTable(rowid),
     FOREIGN KEY (child_id) REFERENCES NodeTable(rowid)
 );
