@@ -6,4 +6,8 @@ class NodeManager:
         self.node_db_wrapper = NodeSQLiteWrapper()
 
     def create(self, name: str):
-        self.node_db_wrapper.insert(name, commit=True)
+        node_id = self.node_db_wrapper.insert(name, commit=True)
+        return node_id
+
+    def get(self, node_id):
+        return self.node_db_wrapper.fetch(id_=node_id)
