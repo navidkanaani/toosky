@@ -9,10 +9,10 @@ class BaseSQLiteWrapper(BaseDBWrapper):
 
 
 
-class NodeSQLiteWrapper(BaseSQLiteWrapper):
-    def __init__(self, db: str = None, table_name: str = None):
-        self.table_name = table_name or Env.NODE_TABLE_NAME
-        self.con = sqlite3.connect(db or Env.DB_NAME)
+class SQLiteWrapper(BaseSQLiteWrapper):
+    def __init__(self, db: str, table_name: str):
+        self.table_name = table_name
+        self.con = sqlite3.connect(db)
         self.con.row_factory = self.dict_factory
 
     dict_factory = staticmethod(
@@ -62,5 +62,4 @@ class NodeSQLiteWrapper(BaseSQLiteWrapper):
             return []
 
     def __del__(self):
-        print(f"Closing connection object {self.con}")
         self.con.close()

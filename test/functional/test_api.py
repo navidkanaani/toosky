@@ -40,5 +40,17 @@ class TestPingAPI(unittest.TestCase):
         ...
 
 
+class TestCreateNode(unittest.TestCase):
+    ...
+
+
+class TestGetNode(unittest.TestCase):
+    ...
+
+
+class TestDeleteNode(unittest.TestCase):
+    ...
+
+
 if __name__ == '__main__':
     unittest.main()
