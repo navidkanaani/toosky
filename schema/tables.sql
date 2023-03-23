@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS NodeRelationTable (
     parent_id INTEGER NOT NULL,
     child_id INTEGER NOT NULL,
     FOREIGN KEY (parent_id) REFERENCES NodeTable(rowid),
-    FOREIGN KEY (child_id) REFERENCES NodeTable(rowid)
+    FOREIGN KEY (child_id) REFERENCES NodeTable(rowid),
+    UNIQUE (parent_id, child_id)
 );
 
 COMMIT;
