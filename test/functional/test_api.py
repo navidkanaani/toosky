@@ -8,7 +8,7 @@ from src.api import app
 from src.environments import Env
 
 
-class TestAPI(unittest.TestCase):
+class TestPingAPI(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
