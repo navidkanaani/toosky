@@ -42,3 +42,25 @@ class NodeSQLiteWrapper(BaseSQLiteWrapper):
             return row
         else:
             raise Exception
+
+    def delete(self, id_, commit=False):
+        crs = self.con.cursor()
+        crs.execute(
+            f"DELETE FROM {self.table_name} WHERE rowid = (?);", (id_,)
+        )
+        if commit:
+            self.con.commit()
+
+    def filter(self):
+        crs = self.con.cursor()
+        crs.execute(
+            f"SELECT rowid, * FROM {self.table_name};"
+        )
+        if rows := crs.fetchall():
+            return rows
+        else:
+            return []
+
+    def __del__(self):
+        print(f"Closing connection object {self.con}")
+        self.con.close()
