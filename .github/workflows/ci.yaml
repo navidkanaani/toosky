@@ -23,4 +23,6 @@ jobs:
       - name: Set up envs
         run: mv .env-example .env
       - name: Running test cases
-        run: python -m unittest -v
+        run: |
+          python scripts/create_tables.py
+          python -m unittest -v
