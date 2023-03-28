@@ -1,12 +1,14 @@
 BEGIN;
 
--- DROP TABLE IF EXISTS ClauseTable;
+-- DROP TABLE IF EXISTS FilterTable;
 -- DROP TABLE IF EXISTS WordTable;
 -- DROP TABLE IF EXISTS NodeTable;
 -- DROP TABLE IF EXISTS NodeRelationTable;
 
 
-CREATE TABLE IF NOT EXISTS ClauseTable (
+CREATE TABLE IF NOT EXISTS FilterTable (
+    token VARCHAR(31) NOT NULL UNIQUE,
+
     /*
         inclusion_type 0 => include
         inclusion_type 1 => exclude
@@ -25,16 +27,20 @@ CREATE TABLE IF NOT EXISTS ClauseTable (
 );
 
 CREATE TABLE IF NOT EXISTS WordTable (
+    token VARCHAR(31) NOT NULL UNIQUE,
     word VARCHAR(255) NOT NULL,
-    clause_id INTEGER,
-    FOREIGN KEY (clause_id) REFERENCES ClauseTable(rowid)
+    filter_id INTEGER,
+    FOREIGN KEY (filter_id) REFERENCES FilterTable(rowid)
 );
 
 CREATE TABLE IF NOT EXISTS NodeTable (
-    node_name VARCHAR(255) NOT NULL UNIQUE
+    token VARCHAR(31) NOT NULL UNIQUE,
+    node_name VARCHAR(255) NOT NULL UNIQUE,
+    description VARCHAR(1023)
 );
 
 CREATE TABLE IF NOT EXISTS NodeRelationTable (
+    token VARCHAR(31) NOT NULL UNIQUE,
     parent_id INTEGER NOT NULL,
     child_id INTEGER NOT NULL,
     FOREIGN KEY (parent_id) REFERENCES NodeTable(rowid),
