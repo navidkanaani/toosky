@@ -45,15 +45,15 @@ class TestNodeManager(unittest.TestCase):
 
 
     def test_get_node_01(self):
-        node = NodeManager(db=Env.TEST_DB_NAME, table_name=Env.NODE_TABLE_NAME).get(node_id=1)
+        node = NodeManager(db=Env.TEST_DB_NAME, table_name=Env.NODE_TABLE_NAME).get(token=self.rows_to_setup[0][0])
         self.assertEqual(node['node_name'], self.rows_to_setup[0][1])
 
     def test_get_node_02(self):
-        node = NodeManager(db=Env.TEST_DB_NAME, table_name=Env.NODE_TABLE_NAME).get(node_id=2)
+        node = NodeManager(db=Env.TEST_DB_NAME, table_name=Env.NODE_TABLE_NAME).get(token=self.rows_to_setup[1][0])
         self.assertEqual(node['node_name'], self.rows_to_setup[1][1])
 
     def test_get_node_03(self):
-        node = NodeManager(db=Env.TEST_DB_NAME, table_name=Env.NODE_TABLE_NAME).get(node_id=3)
+        node = NodeManager(db=Env.TEST_DB_NAME, table_name=Env.NODE_TABLE_NAME).get(token=self.rows_to_setup[2][0])
         self.assertEqual(node['node_name'], self.rows_to_setup[2][1])
 
     def test_create_node_01(self):
