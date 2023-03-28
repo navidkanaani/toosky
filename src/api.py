@@ -18,6 +18,7 @@ def ping():
 def create_node():
     body = request.get_json()
     name = body['name']
+    description = body.get("description", "")
     node_id = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).create(name)
     return Response(f'{{"node_id": {node_id}}}'.encode(), status=201, mimetype='application/json')
 
