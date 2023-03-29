@@ -1,3 +1,4 @@
+import sqlite3
 import threading
 import time
 import unittest
@@ -22,6 +23,8 @@ class TestPingAPI(unittest.TestCase):
         cls.app_thread.daemon = True
         cls.app_thread.start()
         cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
+        cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
+        crs = cls.db_connection.cursor()
         time.sleep(.2)
 
     @staticmethod
@@ -35,13 +38,67 @@ class TestPingAPI(unittest.TestCase):
         self.assertEqual(response.json()['content'], 'pong')
         self.assertEqual(response.status_code, 200)
 
-    @classmethod
-    def tearDownClass(cls):
-        ...
+
 
 
 class TestCreateNode(unittest.TestCase):
-    ...
+    
+    garbage_tokens = []
+
+    @classmethod
+    def setUpClass(cls):
+        cls.shutup_logs()
+        cls.app = app
+        Env._init_envs_(env_file_path='.env')
+        cls.app_thread = threading.Thread(
+            target=cls.app.run, 
+            kwargs={'host': Env.TEST_HOST, 'port': Env.TEST_PORT, 'debug': False}
+        )
+        cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
+        cls.app_thread.daemon = True
+        cls.app_thread.start()
+        cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
+        time.sleep(.2)
+
+    @staticmethod
+    def shutup_logs():
+        import logging
+        log = logging.getLogger('werkzeug')
+        log.disabled = True
+
+
+    def test_create_node_01(self):
+        import json
+        request = {
+            "name": "unusable-node-1",
+            "description": "It's actually an unusable node."
+        }
+        response = requests.post(f'{self.host}/node', json=request)
+        token = response.json()["token"]
+        self.garbage_tokens.append(token)
+        row = self.get_row(token=token)
+        self.assertEqual(row[1], token)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls.db_connection.close()
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.executemany(
+            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", 
+            [(token,) for token in cls.garbage_tokens]
+        )
+
+    def get_row(self, token):
+        cursor = self.db_connection.cursor()
+        cursor.execute(
+            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", (token,)
+        )
+        return cursor.fetchone()
 
 
 class TestGetNode(unittest.TestCase):

@@ -19,14 +19,14 @@ def create_node():
     body = request.get_json()
     name = body['name']
     description = body.get("description", "")
-    node_id = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).create(name=name, description=description)
-    return Response(f'{{"node_id": {node_id}}}'.encode(), status=201, mimetype='application/json')
+    token = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).create(name=name, description=description)
+    return Response(f'{{"token": "{token}"}}'.encode(), status=201, mimetype='application/json')
 
 
 @app.route('/node/<token>', methods=['GET'])
 def get_node(token):
     node = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).get(token=token)
-    return Response(f'{{"node": {node}}}'.encode(), status=200, mimetype='application/json')
+    return Response(f'{{"node": "{node}"}}'.encode(), status=200, mimetype='application/json')
 
 @app.route('/node/<node_id>', methods=['DELETE'])
 def delete_node(node_id):
