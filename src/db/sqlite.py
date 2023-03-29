@@ -21,32 +21,37 @@ class SQLiteWrapper(BaseSQLiteWrapper):
         }
     )
 
-    def insert(self, name, commit=False):
+    def insert(self, *columns, commit=False):
         crs = self.con.cursor()
-        crs.execute(
-            f"INSERT INTO {self.table_name} VALUES (?);", (name,)
-        )
+        query = self._make_insert_query(*columns, table=self.table_name)
+        crs.execute(query, columns)
         if commit:
             self.con.commit()
             return crs.lastrowid
 
+    @staticmethod
+    def _make_insert_query(*columns, table: str):
+        values_placeholder = f"({', '.join('?' * len(columns))})"
+        query = f"INSERT INTO {table} VALUES {values_placeholder};"
+        return query
+
     def commit(self):
         self.con.commit()
 
-    def fetch(self, id_):
+    def fetch(self, token):
         crs = self.con.cursor()
         crs.execute(
-            f"SELECT * FROM {self.table_name} WHERE rowid = (?);", (id_,)
+            f"SELECT * FROM {self.table_name} WHERE token = (?);", (token,)
         )
         if row := crs.fetchone():
             return row
         else:
             raise Exception
 
-    def delete(self, id_, commit=False):
+    def delete(self, token, commit=False):
         crs = self.con.cursor()
         crs.execute(
-            f"DELETE FROM {self.table_name} WHERE rowid = (?);", (id_,)
+            f"DELETE FROM {self.table_name} WHERE token = (?);", (token,)
         )
         if commit:
             self.con.commit()
