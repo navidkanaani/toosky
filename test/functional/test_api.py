@@ -1,5 +1,5 @@
+import multiprocessing
 import sqlite3
-import threading
 import time
 import unittest
 
@@ -16,12 +16,12 @@ class TestPingAPI(unittest.TestCase):
         cls.shutup_logs()
         cls.app = app
         Env._init_envs_(env_file_path='.env')
-        cls.app_thread = threading.Thread(
+        cls.app_process = multiprocessing.Process(
             target=cls.app.run, 
             kwargs={'host': Env.TEST_HOST, 'port': Env.TEST_PORT, 'debug': False}
         )
-        cls.app_thread.daemon = True
-        cls.app_thread.start()
+        cls.app_process.daemon = True
+        cls.app_process.start()
         cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
         cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
         crs = cls.db_connection.cursor()
@@ -50,13 +50,13 @@ class TestCreateNode(unittest.TestCase):
         cls.shutup_logs()
         cls.app = app
         Env._init_envs_(env_file_path='.env')
-        cls.app_thread = threading.Thread(
+        cls.app_process = multiprocessing.Process(
             target=cls.app.run, 
             kwargs={'host': Env.TEST_HOST, 'port': Env.TEST_PORT, 'debug': False}
         )
         cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
-        cls.app_thread.daemon = True
-        cls.app_thread.start()
+        cls.app_process.daemon = True
+        cls.app_process.start()
         cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
         time.sleep(.2)
 
@@ -85,6 +85,8 @@ class TestCreateNode(unittest.TestCase):
         cls.cleanup_table(cursor)
         cls.db_connection.commit()
         cls.db_connection.close()
+        cls.app_process.terminate()
+        cls.app_process.join()
 
     @classmethod
     def cleanup_table(cls, cursor):
