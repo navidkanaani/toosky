@@ -25,4 +25,5 @@ jobs:
       - name: Running test cases
         run: |
           python scripts/create_tables.py
+          sleep .2
           python -m unittest -v
