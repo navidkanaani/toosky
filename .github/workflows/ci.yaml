@@ -24,7 +24,5 @@ jobs:
         run: mv .env-example .env
       - name: Running test cases
         run: |
-          ls -lh
           python scripts/create_tables.py
-          ls -lh
           python -m unittest -v
