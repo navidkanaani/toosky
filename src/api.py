@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request, Response
 
 from src.node import NodeManager
@@ -26,7 +28,8 @@ def create_node():
 @app.route('/node/<token>', methods=['GET'])
 def get_node(token):
     node = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).get(token=token)
-    return Response(f'{{"node": "{node}"}}'.encode(), status=200, mimetype='application/json')
+    response = json.dumps({"node": node})
+    return Response(response, status=200, mimetype='application/json')
 
 @app.route('/node/<node_id>', methods=['DELETE'])
 def delete_node(node_id):
