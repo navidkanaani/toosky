@@ -176,7 +176,6 @@ class TestGetNode(unittest.TestCase):
 
     def test_get_node_01(self):
         row = self.rows_to_setup[0]
-        # import pdb; pdb.set_trace()
         response = requests.get(f'{self.host}/node/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["token"], row[0])
@@ -185,7 +184,6 @@ class TestGetNode(unittest.TestCase):
 
     def test_get_node_02(self):
         row = self.rows_to_setup[1]
-        # import pdb; pdb.set_trace()
         response = requests.get(f'{self.host}/node/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["token"], row[0])
@@ -194,7 +192,6 @@ class TestGetNode(unittest.TestCase):
 
     def test_get_node_03(self):
         row = self.rows_to_setup[2]
-        # import pdb; pdb.set_trace()
         response = requests.get(f'{self.host}/node/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["token"], row[0])
@@ -234,7 +231,89 @@ class TestGetNode(unittest.TestCase):
 
 
 class TestDeleteNode(unittest.TestCase):
-    ...
+    rows_to_setup = [
+        ("token-test-0001", "delete me 0", "hello"),
+        ("token-test-0002", "delete me 1", "okay"),
+        ("token-test-0003", "delete me 2", ""),    
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls.shutup_logs()
+        cls.app = app
+        Env._init_envs_(env_file_path='.env')
+        cls.app_process = multiprocessing.Process(
+            target=cls.app.run, 
+            kwargs={'host': Env.TEST_HOST, 'port': Env.TEST_PORT, 'debug': False}
+        )
+        cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
+        crs = cls.db_connection.cursor()
+        cls.setup_table_records(cursor=crs)
+        cls.db_connection.commit()
+
+        cls.db_connection.row_factory = lambda cursor, row: {
+            k: v for k, v in zip([c[0] for c in cursor.description], row)
+        }
+        cls.app_process.daemon = True
+        cls.app_process.start()
+        cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
+        time.sleep(.2)
+
+    @classmethod
+    def setup_table_records(cls, cursor):
+        cursor.executemany(
+            f"INSERT INTO {Env.NODE_TABLE_NAME} VALUES (?, ?, ?);", cls.rows_to_setup
+        )
+
+    def test_delete_node_01(self):
+        row = self.rows_to_setup[0]
+        response = requests.delete(f'{self.host}/node/{row[0]}')
+        self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
+
+    def test_delete_node_02(self):
+        row = self.rows_to_setup[1]
+        response = requests.delete(f'{self.host}/node/{row[0]}')
+        self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
+
+    def test_delete_node_03(self):
+        row = self.rows_to_setup[2]
+        response = requests.delete(f'{self.host}/node/{row[0]}')
+        self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
+
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.executemany(
+            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", 
+            list(
+                filter(
+                    lambda r: cls.get_row(cursor, r[0]), 
+                    [(row[0],) for row in cls.rows_to_setup]
+                )
+            )
+        )
+
+    @staticmethod
+    def get_row(cursor, token):
+        cursor.execute(
+            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", (token,)
+        )
+        return cursor.fetchone()
+
+    @staticmethod
+    def shutup_logs():
+        import logging
+        log = logging.getLogger('werkzeug')
+        log.disabled = True
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls.db_connection.close()
+        cls.app_process.terminate()
+        cls.app_process.join()
 
 
 if __name__ == '__main__':
