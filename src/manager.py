@@ -16,7 +16,15 @@ class Manager:
         self.node_manager.delete(token=token)
 
     def search_node(self):
-        return self.node_db_wrapper.filter()
+        return self.node_manager.search()
+
+    def update_node(self, token: str, name: str, description: str, parent_token: str):
+        self.node_manager.update(
+            token=token, name=name, 
+            description=description, 
+            parent_token=parent_token,
+            level=None
+        )
 
     def __del__(self):
         self.node_manager.__del__()

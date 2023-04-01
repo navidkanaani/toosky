@@ -50,3 +50,13 @@ def list_nodes():
     return Response(
         response, status=200, mimetype='application/json'
     )
+
+@gaurd_edge
+@app.route('/node/<token>', methods=['PUT'])
+def update_node(token):
+    body = request.get_json()
+    node_name = body.get('name')
+    parent_token = body.get('parent_token')
+    description = body.get('description')
+    Manager().update_node(token=token, name=node_name, description=description, parent_token=parent_token)
+    return Response(b'', status=200, mimetype='application/json')

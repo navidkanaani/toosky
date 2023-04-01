@@ -141,9 +141,9 @@ class TestCreateNode(unittest.TestCase):
 
 class TestGetNode(unittest.TestCase):
     rows_to_setup = [
-        ("token-test-0001", "delete me 0", "hello"),
-        ("token-test-0002", "delete me 1", "okay"),
-        ("token-test-0003", "delete me 2", ""),    
+        ("token-test-0001", "delete me 0", "hello", None, None, None),
+        ("token-test-0002", "delete me 1", "okay", None, None, None),
+        ("token-test-0003", "delete me 2", "", None, None, None),
     ]
 
     @classmethod
@@ -171,7 +171,7 @@ class TestGetNode(unittest.TestCase):
     @classmethod
     def setup_table_records(cls, cursor):
         cursor.executemany(
-            f"INSERT INTO {Env.NODE_TABLE_NAME} VALUES (?, ?, ?);", cls.rows_to_setup
+            f"INSERT INTO {Env.NODE_TABLE_NAME} VALUES (?, ?, ?, ?, ?, ?);", cls.rows_to_setup
         )
 
     def test_get_node_01(self):
@@ -232,9 +232,9 @@ class TestGetNode(unittest.TestCase):
 
 class TestDeleteNode(unittest.TestCase):
     rows_to_setup = [
-        ("token-test-0001", "delete me 0", "hello"),
-        ("token-test-0002", "delete me 1", "okay"),
-        ("token-test-0003", "delete me 2", ""),    
+        ("token-test-0001", "delete me 0", "hello", None, None, None),
+        ("token-test-0002", "delete me 1", "okay", None, None, None),
+        ("token-test-0003", "delete me 2", "", None, None, None),
     ]
 
     @classmethod
@@ -262,7 +262,7 @@ class TestDeleteNode(unittest.TestCase):
     @classmethod
     def setup_table_records(cls, cursor):
         cursor.executemany(
-            f"INSERT INTO {Env.NODE_TABLE_NAME} VALUES (?, ?, ?);", cls.rows_to_setup
+            f"INSERT INTO {Env.NODE_TABLE_NAME} VALUES (?, ?, ?, ?, ?, ?);", cls.rows_to_setup
         )
 
     def test_delete_node_01(self):
