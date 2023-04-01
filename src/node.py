@@ -15,8 +15,8 @@ class NodeManager:
     def get(self, token):
         return self.node_db_wrapper.fetch(token=token)
 
-    def delete(self, node_id):
-        return self.node_db_wrapper.delete(token=node_id, commit=True)
+    def delete(self, token):
+        return self.node_db_wrapper.delete(token=token, commit=True)
 
     def search(self):
         return self.node_db_wrapper.filter()
