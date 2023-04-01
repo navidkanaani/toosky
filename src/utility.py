@@ -1,3 +1,4 @@
+import secrets
 
 
 def gaurd_edge(function):
@@ -10,3 +11,6 @@ def gaurd_edge(function):
             #  Handling error in the near future
             #
             raise
+
+def gen_token(size=32):
+    return secrets.token_hex(size)

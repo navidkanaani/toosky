@@ -1,6 +1,5 @@
-from uuid import uuid4
-
 from src.db.sqlite import SQLiteWrapper
+from src.utility import gen_token
 
 
 class NodeManager:
@@ -8,7 +7,7 @@ class NodeManager:
         self.node_db_wrapper = SQLiteWrapper(db=db, table_name=table_name)
 
     def create(self, name: str, description: str):
-        token = uuid4().hex
+        token = gen_token()
         self.node_db_wrapper.insert(token, name, description, commit=True)
         return token
 
