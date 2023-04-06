@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS FilterTable (
     threshold_type INTEGER CHECK(threshold_type in (0, 1)),
     threshold_value INTEGER,
 
-    node_id INTEGER NOT NULL,
+    rule_id INTEGER NOT NULL,
     
-    FOREIGN KEY (node_id) REFERENCES NodeTable(rowid)
+    FOREIGN KEY (rule_id) REFERENCES RuleTable(rowid)
 );
 
 CREATE TABLE IF NOT EXISTS WordTable (
@@ -33,19 +33,30 @@ CREATE TABLE IF NOT EXISTS WordTable (
     FOREIGN KEY (filter_id) REFERENCES FilterTable(rowid)
 );
 
+CREATE TABLE IF NOT EXISTS RuleTable (
+    token VARCHAR(31) NOT NULL UNIQUE,
+    rule_name VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS NodeTable (
     token VARCHAR(31) NOT NULL UNIQUE,
     node_name VARCHAR(255) NOT NULL UNIQUE,
-    description VARCHAR(1023)
+    description VARCHAR(1023),
+    parent_token VARCHAR(31),
+    rule_token VARCHAR(31),
+    level INTEGER,
+    FOREIGN KEY (rule_token) REFERENCES RuleTable(token),
+    FOREIGN KEY (parent_token) REFERENCES NodeTable(token)
+
 );
 
-CREATE TABLE IF NOT EXISTS NodeRelationTable (
-    token VARCHAR(31) NOT NULL UNIQUE,
-    parent_id INTEGER NOT NULL,
-    child_id INTEGER NOT NULL,
-    FOREIGN KEY (parent_id) REFERENCES NodeTable(rowid),
-    FOREIGN KEY (child_id) REFERENCES NodeTable(rowid),
-    UNIQUE (parent_id, child_id)
-);
+-- CREATE TABLE IF NOT EXISTS NodeRelationTable (
+--     token VARCHAR(31) NOT NULL UNIQUE,
+--     parent_id INTEGER NOT NULL,
+--     child_id INTEGER NOT NULL,
+--     FOREIGN KEY (parent_id) REFERENCES NodeTable(rowid),
+--     FOREIGN KEY (child_id) REFERENCES NodeTable(rowid),
+--     UNIQUE (parent_id, child_id),
+-- );
 
 COMMIT;

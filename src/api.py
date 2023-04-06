@@ -3,43 +3,60 @@ import json
 from flask import Flask, request, Response
 
 from src.node import NodeManager
+from src.manager import Manager
 from src.environments import Env
+from src.utility import gaurd_edge
+
 
 app = Flask(__name__)
 
 Env._init_envs_(env_file_path='.env')
-# node_manager = NodeManager()
 
-
+@gaurd_edge
 @app.route('/ping', methods=['GET'])
 def ping():
     return Response(b'{"content": "pong"}', status=200, mimetype='application/json')
 
 
+@gaurd_edge
 @app.route('/node', methods=['POST'])
 def create_node():
     body = request.get_json()
     name = body['name']
     description = body.get("description", "")
-    token = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).create(name=name, description=description)
+    token = Manager().create_node(name=name, description=description)
     return Response(f'{{"token": "{token}"}}'.encode(), status=201, mimetype='application/json')
 
 
+@gaurd_edge
 @app.route('/node/<token>', methods=['GET'])
 def get_node(token):
-    node = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).get(token=token)
+    node = Manager().get_node(token=token)
     response = json.dumps({"node": node})
     return Response(response, status=200, mimetype='application/json')
 
-@app.route('/node/<node_id>', methods=['DELETE'])
-def delete_node(node_id):
-    node = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).delete(node_id=node_id)
+@gaurd_edge
+@app.route('/node/<token>', methods=['DELETE'])
+def delete_node(token):
+    node = Manager().delete_node(token=token)
     return Response(b'', status=200, mimetype='application/json')
 
 
-@app.route('/node', methods=['GET'])
+@gaurd_edge
+@app.route('/nodes', methods=['GET'])
 def list_nodes():
-    nodes = NodeManager(db=Env.DB_NAME, table_name=Env.NODE_TABLE_NAME).search()
+    nodes = Manager().search_node()
+    response = json.dumps({"nodes": nodes})
     return Response(
-        f'{{"nodes": {nodes}}}'.encode(), status=200, mimetype='application/json'
+        response, status=200, mimetype='application/json'
     )
+
+@gaurd_edge
+@app.route('/node/<token>', methods=['PUT'])
+def update_node(token):
+    body = request.get_json()
+    node_name = body.get('name')
+    parent_token = body.get('parent_token')
+    description = body.get('description')
+    Manager().update_node(token=token, name=node_name, description=description, parent_token=parent_token)
+    return Response(b'', status=200, mimetype='application/json')

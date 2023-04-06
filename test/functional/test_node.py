@@ -8,9 +8,9 @@ from src.environments import Env
 class TestNodeManager(unittest.TestCase):
 
     rows_to_setup = [
-        ("token-test-0001", "delete me 0", "hello"),
-        ("token-test-0002", "delete me 1", "okay"),
-        ("token-test-0003", "delete me 2", ""),
+        ("token-test-0001", "delete me 0", "hello", None, None, None),
+        ("token-test-0002", "delete me 1", "okay", None, None, None),
+        ("token-test-0003", "delete me 2", "", None, None, None),
     ]
 
     rows_created_in_tests = []
@@ -26,7 +26,7 @@ class TestNodeManager(unittest.TestCase):
     @classmethod
     def setup_table_records(cls, cursor):
         cursor.executemany(
-            f"INSERT INTO {Env.NODE_TABLE_NAME} VALUES (?, ?, ?);", cls.rows_to_setup
+            f"INSERT INTO {Env.NODE_TABLE_NAME} VALUES (?, ?, ?, ?, ?, ?);", cls.rows_to_setup
         )
 
     @classmethod

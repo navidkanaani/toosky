@@ -13,6 +13,7 @@ class SQLiteWrapper(BaseSQLiteWrapper):
     def __init__(self, db: str, table_name: str):
         self.table_name = table_name
         self.con = sqlite3.connect(db)
+        self.con.execute("PRAGMA foreign_keys = 1")
         self.con.row_factory = self.dict_factory
 
     dict_factory = staticmethod(
@@ -26,7 +27,7 @@ class SQLiteWrapper(BaseSQLiteWrapper):
         query = self._make_insert_query(*columns, table=self.table_name)
         crs.execute(query, columns)
         if commit:
-            self.con.commit()
+            self.commit()
             return crs.lastrowid
 
     @staticmethod
@@ -54,7 +55,7 @@ class SQLiteWrapper(BaseSQLiteWrapper):
             f"DELETE FROM {self.table_name} WHERE token = (?);", (token,)
         )
         if commit:
-            self.con.commit()
+            self.commit()
 
     def filter(self):
         crs = self.con.cursor()
@@ -65,6 +66,22 @@ class SQLiteWrapper(BaseSQLiteWrapper):
             return rows
         else:
             return []
+
+    def update(self, token, values: dict, commit=False):
+        crs = self.con.cursor()
+        query = self._make_update_query(values, self.table_name)
+        crs.execute(
+            query, tuple(list(values.values()) + [token])
+        )
+        if commit:
+            self.commit()
+
+    @staticmethod
+    def _make_update_query(values, table: str):
+        values_placeholder = f"{', '.join(f'{k} = ?' for k in values)}"
+        query = f"UPDATE {table} SET {values_placeholder} WHERE token = (?);"
+        return query
+
 
     def __del__(self):
         self.con.close()
