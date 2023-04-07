@@ -4,12 +4,7 @@ from src.environments import Env
 from src.interfaces import BaseDBWrapper
 
 
-class BaseSQLiteWrapper(BaseDBWrapper):
-    ...
-
-
-
-class SQLiteWrapper(BaseSQLiteWrapper):
+class SQLiteWrapper(BaseDBWrapper):
     def __init__(self, db: str, table_name: str):
         self.table_name = table_name
         self.con = sqlite3.connect(db)
