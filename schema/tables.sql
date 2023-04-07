@@ -7,7 +7,7 @@ BEGIN;
 
 
 CREATE TABLE IF NOT EXISTS FilterTable (
-    token VARCHAR(31) NOT NULL UNIQUE,
+    eid VARCHAR(31) NOT NULL UNIQUE,
 
     /*
         inclusion_type 0 => include
@@ -27,31 +27,31 @@ CREATE TABLE IF NOT EXISTS FilterTable (
 );
 
 CREATE TABLE IF NOT EXISTS WordTable (
-    token VARCHAR(31) NOT NULL UNIQUE,
+    eid VARCHAR(31) NOT NULL UNIQUE,
     word VARCHAR(255) NOT NULL,
     filter_id INTEGER,
     FOREIGN KEY (filter_id) REFERENCES FilterTable(rowid)
 );
 
 CREATE TABLE IF NOT EXISTS RuleTable (
-    token VARCHAR(31) NOT NULL UNIQUE,
+    eid VARCHAR(31) NOT NULL UNIQUE,
     rule_name VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS NodeTable (
-    token VARCHAR(31) NOT NULL UNIQUE,
+    eid VARCHAR(31) NOT NULL UNIQUE,
     node_name VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(1023),
-    parent_token VARCHAR(31),
-    rule_token VARCHAR(31),
+    parent_eid VARCHAR(31),
+    rule_eid VARCHAR(31),
     level INTEGER,
-    FOREIGN KEY (rule_token) REFERENCES RuleTable(token),
-    FOREIGN KEY (parent_token) REFERENCES NodeTable(token)
+    FOREIGN KEY (rule_eid) REFERENCES RuleTable(eid),
+    FOREIGN KEY (parent_eid) REFERENCES NodeTable(eid)
 
 );
 
 -- CREATE TABLE IF NOT EXISTS NodeRelationTable (
---     token VARCHAR(31) NOT NULL UNIQUE,
+--     eid VARCHAR(31) NOT NULL UNIQUE,
 --     parent_id INTEGER NOT NULL,
 --     child_id INTEGER NOT NULL,
 --     FOREIGN KEY (parent_id) REFERENCES NodeTable(rowid),

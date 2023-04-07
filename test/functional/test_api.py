@@ -43,7 +43,7 @@ class TestPingAPI(unittest.TestCase):
 
 class TestCreateNode(unittest.TestCase):
     
-    garbage_tokens = []
+    garbage_eids= []
 
     @classmethod
     def setUpClass(cls):
@@ -77,10 +77,10 @@ class TestCreateNode(unittest.TestCase):
             "description": "It's actually an unusable node."
         }
         response = requests.post(f'{self.host}/node', json=request)
-        token = response.json()["token"]
-        self.garbage_tokens.append(token)
-        row = self.get_row(token=token)
-        self.assertEqual(row["token"], token)
+        eid = response.json()["eid"]
+        self.garbage_eids.append(eid)
+        row = self.get_row(eid=eid)
+        self.assertEqual(row["eid"], eid)
         self.assertEqual(row["node_name"], request["name"])
         self.assertEqual(row["description"], request["description"])
 
@@ -92,10 +92,10 @@ class TestCreateNode(unittest.TestCase):
             "description": ""
         }
         response = requests.post(f'{self.host}/node', json=request)
-        token = response.json()["token"]
-        self.garbage_tokens.append(token)
-        row = self.get_row(token=token)
-        self.assertEqual(row["token"], token)
+        eid = response.json()["eid"]
+        self.garbage_eids.append(eid)
+        row = self.get_row(eid=eid)
+        self.assertEqual(row["eid"], eid)
         self.assertEqual(row["node_name"], request["name"])
         self.assertEqual(row["description"], request["description"])
 
@@ -107,10 +107,10 @@ class TestCreateNode(unittest.TestCase):
             "description": "Its okay to be description"
         }
         response = requests.post(f'{self.host}/node', json=request)
-        token = response.json()["token"]
-        self.garbage_tokens.append(token)
-        row = self.get_row(token=token)
-        self.assertEqual(row["token"], token)
+        eid = response.json()["eid"]
+        self.garbage_eids.append(eid)
+        row = self.get_row(eid=eid)
+        self.assertEqual(row["eid"], eid)
         self.assertEqual(row["node_name"], request["name"])
         self.assertEqual(row["description"], request["description"])
 
@@ -127,23 +127,23 @@ class TestCreateNode(unittest.TestCase):
     @classmethod
     def cleanup_table(cls, cursor):
         cursor.executemany(
-            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", 
-            [(token,) for token in cls.garbage_tokens]
+            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE eid = (?);", 
+            [(eid,) for eid in cls.garbage_eids]
         )
 
-    def get_row(self, token):
+    def get_row(self, eid):
         cursor = self.db_connection.cursor()
         cursor.execute(
-            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", (token,)
+            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE eid = (?);", (eid,)
         )
         return cursor.fetchone()
 
 
 class TestGetNode(unittest.TestCase):
     rows_to_setup = [
-        ("token-test-0001", "delete me 0", "hello", None, None, None),
-        ("token-test-0002", "delete me 1", "okay", None, None, None),
-        ("token-test-0003", "delete me 2", "", None, None, None),
+        ("eid-test-0001", "delete me 0", "hello", None, None, None),
+        ("eid-test-0002", "delete me 1", "okay", None, None, None),
+        ("eid-test-0003", "delete me 2", "", None, None, None),
     ]
 
     @classmethod
@@ -178,7 +178,7 @@ class TestGetNode(unittest.TestCase):
         row = self.rows_to_setup[0]
         response = requests.get(f'{self.host}/node/{row[0]}')
         node = response.json()["node"]
-        self.assertEqual(node["token"], row[0])
+        self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
         self.assertEqual(node["description"], row[2])
 
@@ -186,7 +186,7 @@ class TestGetNode(unittest.TestCase):
         row = self.rows_to_setup[1]
         response = requests.get(f'{self.host}/node/{row[0]}')
         node = response.json()["node"]
-        self.assertEqual(node["token"], row[0])
+        self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
         self.assertEqual(node["description"], row[2])
 
@@ -194,7 +194,7 @@ class TestGetNode(unittest.TestCase):
         row = self.rows_to_setup[2]
         response = requests.get(f'{self.host}/node/{row[0]}')
         node = response.json()["node"]
-        self.assertEqual(node["token"], row[0])
+        self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
         self.assertEqual(node["description"], row[2])
 
@@ -202,14 +202,14 @@ class TestGetNode(unittest.TestCase):
     @classmethod
     def cleanup_table(cls, cursor):
         cursor.executemany(
-            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", 
+            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE eid = (?);", 
             [(row[0],) for row in cls.rows_to_setup]
         )
 
-    def get_row(self, token):
+    def get_row(self, eid):
         cursor = self.db_connection.cursor()
         cursor.execute(
-            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", (token,)
+            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE eid = (?);", (eid,)
         )
         return cursor.fetchone()
 
@@ -232,9 +232,9 @@ class TestGetNode(unittest.TestCase):
 
 class TestDeleteNode(unittest.TestCase):
     rows_to_setup = [
-        ("token-test-0001", "delete me 0", "hello", None, None, None),
-        ("token-test-0002", "delete me 1", "okay", None, None, None),
-        ("token-test-0003", "delete me 2", "", None, None, None),
+        ("eid-test-0001", "delete me 0", "hello", None, None, None),
+        ("eid-test-0002", "delete me 1", "okay", None, None, None),
+        ("eid-test-0003", "delete me 2", "", None, None, None),
     ]
 
     @classmethod
@@ -284,7 +284,7 @@ class TestDeleteNode(unittest.TestCase):
     @classmethod
     def cleanup_table(cls, cursor):
         cursor.executemany(
-            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", 
+            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE eid = (?);", 
             list(
                 filter(
                     lambda r: cls.get_row(cursor, r[0]), 
@@ -294,9 +294,9 @@ class TestDeleteNode(unittest.TestCase):
         )
 
     @staticmethod
-    def get_row(cursor, token):
+    def get_row(cursor, eid):
         cursor.execute(
-            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE token = (?);", (token,)
+            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE eid = (?);", (eid,)
         )
         return cursor.fetchone()
 

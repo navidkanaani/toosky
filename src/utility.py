@@ -14,5 +14,5 @@ def gaurd_edge(function):
     return wrapper
 
 
-def gen_token(size=32):
+def gen_eid(size=32):
     return secrets.token_hex(size)

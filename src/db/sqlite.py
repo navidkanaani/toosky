@@ -39,20 +39,20 @@ class SQLiteWrapper(BaseSQLiteWrapper):
     def commit(self):
         self.con.commit()
 
-    def fetch(self, token):
+    def fetch(self, eid):
         crs = self.con.cursor()
         crs.execute(
-            f"SELECT * FROM {self.table_name} WHERE token = (?);", (token,)
+            f"SELECT * FROM {self.table_name} WHERE eid = (?);", (eid,)
         )
         if row := crs.fetchone():
             return row
         else:
             raise Exception
 
-    def delete(self, token, commit=False):
+    def delete(self, eid, commit=False):
         crs = self.con.cursor()
         crs.execute(
-            f"DELETE FROM {self.table_name} WHERE token = (?);", (token,)
+            f"DELETE FROM {self.table_name} WHERE eid = (?);", (eid,)
         )
         if commit:
             self.commit()
@@ -67,11 +67,11 @@ class SQLiteWrapper(BaseSQLiteWrapper):
         else:
             return []
 
-    def update(self, token, values: dict, commit=False):
+    def update(self, eid, values: dict, commit=False):
         crs = self.con.cursor()
         query = self._make_update_query(values, self.table_name)
         crs.execute(
-            query, tuple(list(values.values()) + [token])
+            query, tuple(list(values.values()) + [eid])
         )
         if commit:
             self.commit()
@@ -79,7 +79,7 @@ class SQLiteWrapper(BaseSQLiteWrapper):
     @staticmethod
     def _make_update_query(values, table: str):
         values_placeholder = f"{', '.join(f'{k} = ?' for k in values)}"
-        query = f"UPDATE {table} SET {values_placeholder} WHERE token = (?);"
+        query = f"UPDATE {table} SET {values_placeholder} WHERE eid = (?);"
         return query
 
 
