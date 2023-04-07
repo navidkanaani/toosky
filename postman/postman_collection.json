@@ -36,7 +36,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"body\": \"\",\n    \"name\": \"\",\n    \"description\": \"\",\n    \"token\": \"\"\n}",
+					"raw": "{\n    \"name\": \"\",\n    \"description\": \"\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -114,8 +114,17 @@
 			"request": {
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"\",\n    \"parent_token\": \"\",\n    \"description\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://127.0.0.1:5151/node/update/",
+					"raw": "http://127.0.0.1:5151/node/update/2aa9746167eba119171cdacfbe48b4b4d7667a5fbe3b04fc14f2e27110ce281e",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -127,7 +136,7 @@
 					"path": [
 						"node",
 						"update",
-						""
+						"2aa9746167eba119171cdacfbe48b4b4d7667a5fbe3b04fc14f2e27110ce281e"
 					]
 				}
 			},
