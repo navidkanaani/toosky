@@ -19,7 +19,7 @@ def ping():
 
 
 @gaurd_edge
-@app.route('/node', methods=['POST'])
+@app.route('/node/create', methods=['POST'])
 def create_node():
     body = request.get_json()
     name = body['name']
@@ -29,21 +29,21 @@ def create_node():
 
 
 @gaurd_edge
-@app.route('/node/<token>', methods=['GET'])
+@app.route('/node/search/<token>', methods=['GET'])
 def get_node(token):
     node = Manager().get_node(token=token)
     response = json.dumps({"node": node})
     return Response(response, status=200, mimetype='application/json')
 
 @gaurd_edge
-@app.route('/node/<token>', methods=['DELETE'])
+@app.route('/node/delete/<token>', methods=['DELETE'])
 def delete_node(token):
     node = Manager().delete_node(token=token)
     return Response(b'', status=200, mimetype='application/json')
 
 
 @gaurd_edge
-@app.route('/nodes', methods=['GET'])
+@app.route('/node/list', methods=['GET'])
 def list_nodes():
     nodes = Manager().search_node()
     response = json.dumps({"nodes": nodes})
@@ -52,7 +52,7 @@ def list_nodes():
     )
 
 @gaurd_edge
-@app.route('/node/<token>', methods=['PUT'])
+@app.route('/node/update/<token>', methods=['PUT'])
 def update_node(token):
     body = request.get_json()
     node_name = body.get('name')
