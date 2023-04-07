@@ -76,7 +76,7 @@ class TestCreateNode(unittest.TestCase):
             "name": "unusable-node-1",
             "description": "It's actually an unusable node."
         }
-        response = requests.post(f'{self.host}/node', json=request)
+        response = requests.post(f'{self.host}/node/create', json=request)
         token = response.json()["token"]
         self.garbage_tokens.append(token)
         row = self.get_row(token=token)
@@ -91,7 +91,7 @@ class TestCreateNode(unittest.TestCase):
             "name": "unusable-node-2",
             "description": ""
         }
-        response = requests.post(f'{self.host}/node', json=request)
+        response = requests.post(f'{self.host}/node/create', json=request)
         token = response.json()["token"]
         self.garbage_tokens.append(token)
         row = self.get_row(token=token)
@@ -106,7 +106,7 @@ class TestCreateNode(unittest.TestCase):
             "name": "unusable-node-3",
             "description": "Its okay to be description"
         }
-        response = requests.post(f'{self.host}/node', json=request)
+        response = requests.post(f'{self.host}/node/create', json=request)
         token = response.json()["token"]
         self.garbage_tokens.append(token)
         row = self.get_row(token=token)
@@ -176,7 +176,7 @@ class TestGetNode(unittest.TestCase):
 
     def test_get_node_01(self):
         row = self.rows_to_setup[0]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/node/search/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["token"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -184,7 +184,7 @@ class TestGetNode(unittest.TestCase):
 
     def test_get_node_02(self):
         row = self.rows_to_setup[1]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/node/search/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["token"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -192,7 +192,7 @@ class TestGetNode(unittest.TestCase):
 
     def test_get_node_03(self):
         row = self.rows_to_setup[2]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/node/search/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["token"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -267,17 +267,17 @@ class TestDeleteNode(unittest.TestCase):
 
     def test_delete_node_01(self):
         row = self.rows_to_setup[0]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/node/delete/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
     def test_delete_node_02(self):
         row = self.rows_to_setup[1]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/node/delete/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
     def test_delete_node_03(self):
         row = self.rows_to_setup[2]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/node/delete/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
 
