@@ -9,20 +9,20 @@ class Manager:
     def create_node(self, name: str, description: str):
         return self.node_manager.create(name=name, description=description)
 
-    def get_node(self, token: str) -> dict:
-        return self.node_manager.get(token=token)
+    def get_node(self, eid: str) -> dict:
+        return self.node_manager.get(eid=eid)
 
-    def delete_node(self, token: str):
-        self.node_manager.delete(token=token)
+    def delete_node(self, eid: str):
+        self.node_manager.delete(eid=eid)
 
     def search_node(self):
         return self.node_manager.search()
 
-    def update_node(self, token: str, name: str, description: str, parent_token: str):
+    def update_node(self, eid: str, name: str, description: str, parent_eid: str):
         self.node_manager.update(
-            token=token, name=name, 
+            eid=eid, name=name, 
             description=description, 
-            parent_token=parent_token,
+            parent_eid=parent_eid,
             level=None
         )
 

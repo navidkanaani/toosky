@@ -24,21 +24,21 @@ def create_node():
     body = request.get_json()
     name = body['name']
     description = body.get("description", "")
-    token = Manager().create_node(name=name, description=description)
-    return Response(f'{{"token": "{token}"}}'.encode(), status=201, mimetype='application/json')
+    eid = Manager().create_node(name=name, description=description)
+    return Response(f'{{"eid": "{eid}"}}'.encode(), status=201, mimetype='application/json')
 
 
 @gaurd_edge
-@app.route('/node/<token>', methods=['GET'])
-def get_node(token):
-    node = Manager().get_node(token=token)
+@app.route('/node/<eid>', methods=['GET'])
+def get_node(eid):
+    node = Manager().get_node(eid=eid)
     response = json.dumps({"node": node})
     return Response(response, status=200, mimetype='application/json')
 
 @gaurd_edge
-@app.route('/node/<token>', methods=['DELETE'])
-def delete_node(token):
-    node = Manager().delete_node(token=token)
+@app.route('/node/<eid>', methods=['DELETE'])
+def delete_node(eid):
+    node = Manager().delete_node(eid=eid)
     return Response(b'', status=200, mimetype='application/json')
 
 
@@ -52,11 +52,11 @@ def list_nodes():
     )
 
 @gaurd_edge
-@app.route('/node/<token>', methods=['PUT'])
-def update_node(token):
+@app.route('/node/<eid>', methods=['PUT'])
+def update_node(eid):
     body = request.get_json()
     node_name = body.get('name')
-    parent_token = body.get('parent_token')
+    parent_eid = body.get('parent_eid')
     description = body.get('description')
-    Manager().update_node(token=token, name=node_name, description=description, parent_token=parent_token)
+    Manager().update_node(eid=eid, name=node_name, description=description, parent_eid=parent_eid)
     return Response(b'', status=200, mimetype='application/json')
