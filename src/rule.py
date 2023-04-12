@@ -17,8 +17,12 @@ class RuleManager:
     def search(self):
         return self.sql_wrapper.filter()
         
-    def update(self, eid: str):
-        ...
+    def update(self, eid: str, name: str):
+        values = {
+            "rule_name": name
+        }
+        self.sql_wrapper.update(eid=eid, values=values, commit=True)
+        
         
     def delete(self, eid):
         ...

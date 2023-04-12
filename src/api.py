@@ -83,3 +83,12 @@ def list_rules():
     rules = Manager().search_rule()
     response = json.dumps(rules)
     return Response(response, status=200, mimetype="application/json")
+
+@gaurd_edge
+@app.route("/rules/<eid>", methods=["PUT"])
+def update_rule(eid):
+    body = request.get_json()
+    name = body["name"]
+    Manager().update_rule(eid=eid, name=name)
+    return Response(b'', status=200, mimetype="application/json")
+    

@@ -37,8 +37,9 @@ class Manager:
     def search_rule(self):
         return self.rule_manager.search()
         
-    def update_rule():
-        ...
+    def update_rule(self, eid: str, name: str):
+        self.rule_manager.update(eid=eid, name=name)
+        
     
     def delete_rule():
         ...
