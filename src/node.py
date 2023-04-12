@@ -34,7 +34,6 @@ class NodeManager:
             values['level'] = level
         self.node_db_wrapper.update(eid, values=values, commit=True)
 
-
     def __del__(self):
         self.node_db_wrapper.__del__()
 

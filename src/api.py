@@ -29,14 +29,14 @@ def create_node():
 
 
 @gaurd_edge
-@app.route('/node/<eid>', methods=['GET'])
+@app.route('/nodes/<eid>', methods=['GET'])
 def get_node(eid):
     node = Manager().get_node(eid=eid)
     response = json.dumps({"node": node})
     return Response(response, status=200, mimetype='application/json')
 
 @gaurd_edge
-@app.route('/node/<eid>', methods=['DELETE'])
+@app.route('/nodes/<eid>', methods=['DELETE'])
 def delete_node(eid):
     node = Manager().delete_node(eid=eid)
     return Response(b'', status=200, mimetype='application/json')
@@ -52,7 +52,7 @@ def list_nodes():
     )
 
 @gaurd_edge
-@app.route('/node/<eid>', methods=['PUT'])
+@app.route('/nodes/<eid>', methods=['PUT'])
 def update_node(eid):
     body = request.get_json()
     node_name = body.get('name')

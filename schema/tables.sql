@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS FilterTable (
 
     rule_eid INTEGER NOT NULL,
     
-    FOREIGN KEY (rule_eid) REFERENCES RuleTable(rowid)
+    FOREIGN KEY (rule_eid) REFERENCES RuleTable(eid)
 );
 
 CREATE TABLE IF NOT EXISTS WordTable (

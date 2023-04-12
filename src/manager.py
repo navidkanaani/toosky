@@ -38,8 +38,7 @@ class Manager:
         return self.rule_manager.search()
         
     def update_rule(self, eid: str, name: str):
-        self.rule_manager.update(eid=eid, name=name)
-        
+        self.rule_manager.update(eid=eid, name=name)    
     
     def delete_rule(self, eid: str):
         self.rule_manager.delete(eid=eid)

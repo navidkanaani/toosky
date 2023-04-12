@@ -21,8 +21,7 @@ class RuleManager:
         values = {
             "rule_name": name
         }
-        self.sql_wrapper.update(eid=eid, values=values, commit=True)
-        
+        self.sql_wrapper.update(eid=eid, values=values, commit=True)  
         
     def delete(self, eid):
         self.sql_wrapper.delete(eid=eid, commit=True)
