@@ -25,4 +25,4 @@ class RuleManager:
         
         
     def delete(self, eid):
-        ...
+        self.sql_wrapper.delete(eid=eid, commit=True)

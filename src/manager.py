@@ -41,8 +41,8 @@ class Manager:
         self.rule_manager.update(eid=eid, name=name)
         
     
-    def delete_rule():
-        ...
+    def delete_rule(self, eid: str):
+        self.rule_manager.delete(eid=eid)
     
     def __del__(self):
         self.node_manager.__del__()

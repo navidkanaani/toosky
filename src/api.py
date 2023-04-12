@@ -92,3 +92,8 @@ def update_rule(eid):
     Manager().update_rule(eid=eid, name=name)
     return Response(b'', status=200, mimetype="application/json")
     
+@gaurd_edge
+@app.route("/rules/<eid>", methods=["DELETE"])
+def delete_rule(eid):
+    Manager().delete_rule(eid=eid)
+    return Response(b'', status=200, mimetype="application/json")
