@@ -60,3 +60,26 @@ def update_node(eid):
     description = body.get('description')
     Manager().update_node(eid=eid, name=node_name, description=description, parent_eid=parent_eid)
     return Response(b'', status=200, mimetype='application/json')
+
+@gaurd_edge
+@app.route("/rule", methods=["POST"])
+def create_rule():
+    body = request.get_json()
+    rule_name = body["name"]
+    rule_eid = Manager().create_rule(name=rule_name)
+    return Response(f"rule_eid: {rule_eid}", status=200, mimetype="application/json")
+    
+
+@gaurd_edge
+@app.route("/rules/<eid>", methods=["GET"])
+def get_rule(eid: str):
+    rule = Manager().get_rule(eid=eid)
+    response = json.dumps(rule)
+    return Response(response, status=200, mimetype="application/json")
+
+@gaurd_edge
+@app.route("/rules", methods=["GET"])
+def list_rules():
+    rules = Manager().search_rule()
+    response = json.dumps(rules)
+    return Response(response, status=200, mimetype="application/json")
