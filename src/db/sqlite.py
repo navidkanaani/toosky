@@ -52,15 +52,22 @@ class SQLiteWrapper(BaseDBWrapper):
         if commit:
             self.commit()
 
-    def filter(self):
+    def filter(self, values={}):
         crs = self.con.cursor()
+        query = self._make_filter_query(values=values, table=self.table_name)
         crs.execute(
-            f"SELECT rowid, * FROM {self.table_name};"
+            query, tuple(list(values.values()))
         )
         if rows := crs.fetchall():
             return rows
         else:
             return []
+
+    @staticmethod
+    def _make_filter_query(values, table: str):
+        values_placeholder = ' AND '.join(f'{k} = ?' for k in values)
+        query = f"SELECT rowid, * FROM {table}{' WHERE ' if values else ''}{values_placeholder};"
+        return query
 
     def update(self, eid, values: dict, commit=False):
         crs = self.con.cursor()
