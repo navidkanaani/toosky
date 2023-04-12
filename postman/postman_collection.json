@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "0e380530-67f8-4d6f-b687-4904316ee678",
+		"_postman_id": "62352627-6637-439c-85d8-a34db30a2c12",
 		"name": "Toosky API Collection",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26056829"
 	},
 	"item": [
 		{
@@ -11,7 +12,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5151/node",
+					"raw": "http://127.0.0.1:5151/node/list",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -21,7 +22,8 @@
 					],
 					"port": "5151",
 					"path": [
-						"node"
+						"node",
+						"list"
 					]
 				}
 			},
@@ -34,7 +36,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"NoDe tow\",\n    \"description\": \"I'm a little node\"\n}",
+					"raw": "{\n    \"name\": \"Node two\",\n    \"description\": \"Something\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -42,7 +44,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5151/node",
+					"raw": "http://127.0.0.1:5151/node/create",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -52,7 +54,8 @@
 					],
 					"port": "5151",
 					"path": [
-						"node"
+						"node",
+						"create"
 					]
 				}
 			},
@@ -62,15 +65,211 @@
 			"name": "Get Node",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5151/node/search/18c24354ee21f83f34762c1ad8ee63e7e1b03cf8bfe283f85289106900dd731f",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"node",
+						"search",
+						"18c24354ee21f83f34762c1ad8ee63e7e1b03cf8bfe283f85289106900dd731f"
+					]
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "Delete Node",
 			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5151/node/delete/18c24354ee21f83f34762c1ad8ee63e7e1b03cf8bfe283f85289106900dd731f",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"node",
+						"delete",
+						"18c24354ee21f83f34762c1ad8ee63e7e1b03cf8bfe283f85289106900dd731f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Node",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"parent_token\": \"bcc0b6d59f9665fbae6b9df5d799c2878433bd7c8b41eeb52e3656bf3e1e2456\",\n    \"level\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5151/node/update/84fc8707ee9495f27ce4c541c67332877e3147eee477f1731201634843ccec88",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"node",
+						"update",
+						"84fc8707ee9495f27ce4c541c67332877e3147eee477f1731201634843ccec88"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Rule",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Rule One\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5151/rule",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"rule"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Rule",
+			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5151/rules/1a7cf19b230e711c0c25fe03ff7554419ea6cec4ff710ad624602d2ceff2bc99",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"rules",
+						"1a7cf19b230e711c0c25fe03ff7554419ea6cec4ff710ad624602d2ceff2bc99"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Rules",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5151/rules",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"rules"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update rule",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Rule dard\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5151/rules/1a7cf19b230e711c0c25fe03ff7554419ea6cec4ff710ad624602d2ceff2bc99",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"rules",
+						"1a7cf19b230e711c0c25fe03ff7554419ea6cec4ff710ad624602d2ceff2bc99"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Rule",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5151/rules/e73ba19bc36386745a582f8e1cdd950f37830b224eb584cbac9fe338f81b0bf0",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"rules",
+						"e73ba19bc36386745a582f8e1cdd950f37830b224eb584cbac9fe338f81b0bf0"
+					]
+				}
 			},
 			"response": []
 		}
