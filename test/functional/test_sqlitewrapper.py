@@ -25,3 +25,15 @@ class TestSQLiteWrapper(unittest.TestCase):
     def test_make_update_query_02(self):
         query = SQLiteWrapper._make_update_query({"name": "new_name"}, "test_table")
         self.assertEqual(query, "UPDATE test_table SET name = ? WHERE eid = (?);")
+
+    def test_make_filter_query_01(self):
+        query = SQLiteWrapper._make_filter_query(values={"name": "Ali"}, table="Users")
+        self.assertEqual(query, "SELECT rowid, * FROM Users WHERE name = ?;")
+
+    def test_make_filter_query_02(self):
+        query = SQLiteWrapper._make_filter_query(values={"name": "Ali", "age": 43}, table="Users")
+        self.assertEqual(query, "SELECT rowid, * FROM Users WHERE name = ? AND age = ?;")
+
+    def test_make_filter_query_03(self):
+        query = SQLiteWrapper._make_filter_query(values={}, table="Users")
+        self.assertEqual(query, "SELECT rowid, * FROM Users;")
