@@ -319,7 +319,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         cls.db_connection.commit()
         cls._tearDownClass()
 
-    def test_description_01(self):
+    def test_update_description_01(self):
         row = self.rows_to_setup[0]
         new_description01 = "newly generated one"
         request = {
@@ -337,7 +337,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         updated_row02 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row02['description'], new_description02)
 
-    def test_name_01(self):
+    def test_update_name_01(self):
         row = self.rows_to_setup[0]
         new_name01 = "new name number one"
         request = {
@@ -355,6 +355,23 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         updated_row02 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row02['node_name'], new_name02)
 
+    def test_update_parent_eid_01(self):
+        row0 = self.rows_to_setup[0]  # child
+        row1 = self.rows_to_setup[1]  # parent
+        request = {
+            "parent_eid": row1[0]
+        }
+        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
+        self.assertEqual(updated_row0['parent_eid'], row1[0])
+
+        row2 = self.rows_to_setup[2]  # parent
+        request = {
+            "parent_eid": row2[0]
+        }
+        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
+        self.assertEqual(updated_row0['parent_eid'], row2[0])
 
 
 if __name__ == '__main__':
