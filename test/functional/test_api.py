@@ -8,45 +8,10 @@ import requests
 from src.api import app
 from src.environments import Env
 
-
-class TestPingAPI(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.shutup_logs()
-        cls.app = app
-        Env._init_envs_(env_file_path='.env')
-        cls.app_process = multiprocessing.Process(
-            target=cls.app.run, 
-            kwargs={'host': Env.TEST_HOST, 'port': Env.TEST_PORT, 'debug': False}
-        )
-        cls.app_process.daemon = True
-        cls.app_process.start()
-        cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
-        cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
-        crs = cls.db_connection.cursor()
-        time.sleep(.2)
-
-    @staticmethod
-    def shutup_logs():
-        import logging
-        log = logging.getLogger('werkzeug')
-        log.disabled = True
-
-    def test_ping_01(self):
-        response = requests.get(f'{self.host}/ping')
-        self.assertEqual(response.json()['content'], 'pong')
-        self.assertEqual(response.status_code, 200)
-
-
-
-
-class TestCreateNode(unittest.TestCase):
-    
-    garbage_eids= []
+class BaseAPITest:
 
     @classmethod
-    def setUpClass(cls):
+    def _setUpClass(cls):
         cls.shutup_logs()
         cls.app = app
         Env._init_envs_(env_file_path='.env')
@@ -63,12 +28,51 @@ class TestCreateNode(unittest.TestCase):
         cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
         time.sleep(.2)
 
+
     @staticmethod
     def shutup_logs():
         import logging
         log = logging.getLogger('werkzeug')
         log.disabled = True
 
+
+    @classmethod
+    def _tearDownClass(cls):
+        cls.db_connection.close()
+        cls.app_process.terminate()
+        cls.app_process.join()
+
+
+class TestPingAPI(unittest.TestCase, BaseAPITest):
+
+    @classmethod
+    def setUpClass(cls):
+        cls._setUpClass()
+
+    @staticmethod
+    def shutup_logs():
+        import logging
+        log = logging.getLogger('werkzeug')
+        log.disabled = True
+
+    def test_ping_01(self):
+        response = requests.get(f'{self.host}/ping')
+        self.assertEqual(response.json()['content'], 'pong')
+        self.assertEqual(response.status_code, 200)
+
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tearDownClass()
+
+
+class TestCreateNode(unittest.TestCase, BaseAPITest):
+    
+    garbage_eids = []
+
+    @classmethod
+    def setUpClass(cls):
+        cls._setUpClass()
 
     def test_create_node_01(self):
         import json
@@ -120,9 +124,7 @@ class TestCreateNode(unittest.TestCase):
         cursor = cls.db_connection.cursor()
         cls.cleanup_table(cursor)
         cls.db_connection.commit()
-        cls.db_connection.close()
-        cls.app_process.terminate()
-        cls.app_process.join()
+        cls._tearDownClass()
 
     @classmethod
     def cleanup_table(cls, cursor):
@@ -139,7 +141,7 @@ class TestCreateNode(unittest.TestCase):
         return cursor.fetchone()
 
 
-class TestGetNode(unittest.TestCase):
+class TestGetNode(unittest.TestCase, BaseAPITest):
     rows_to_setup = [
         ("eid-test-0001", "delete me 0", "hello", None, None, None),
         ("eid-test-0002", "delete me 1", "okay", None, None, None),
@@ -148,25 +150,11 @@ class TestGetNode(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.shutup_logs()
-        cls.app = app
-        Env._init_envs_(env_file_path='.env')
-        cls.app_process = multiprocessing.Process(
-            target=cls.app.run, 
-            kwargs={'host': Env.TEST_HOST, 'port': Env.TEST_PORT, 'debug': False}
-        )
-        cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
+        cls._setUpClass()
         crs = cls.db_connection.cursor()
         cls.setup_table_records(cursor=crs)
         cls.db_connection.commit()
 
-        cls.db_connection.row_factory = lambda cursor, row: {
-            k: v for k, v in zip([c[0] for c in cursor.description], row)
-        }
-        cls.app_process.daemon = True
-        cls.app_process.start()
-        cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
-        time.sleep(.2)
 
     @classmethod
     def setup_table_records(cls, cursor):
@@ -213,24 +201,15 @@ class TestGetNode(unittest.TestCase):
         )
         return cursor.fetchone()
 
-
-    @staticmethod
-    def shutup_logs():
-        import logging
-        log = logging.getLogger('werkzeug')
-        log.disabled = True
-
     @classmethod
     def tearDownClass(cls):
         cursor = cls.db_connection.cursor()
         cls.cleanup_table(cursor)
         cls.db_connection.commit()
-        cls.db_connection.close()
-        cls.app_process.terminate()
-        cls.app_process.join()
+        cls._tearDownClass()
 
 
-class TestDeleteNode(unittest.TestCase):
+class TestDeleteNode(unittest.TestCase, BaseAPITest):
     rows_to_setup = [
         ("eid-test-0001", "delete me 0", "hello", None, None, None),
         ("eid-test-0002", "delete me 1", "okay", None, None, None),
@@ -239,25 +218,11 @@ class TestDeleteNode(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.shutup_logs()
-        cls.app = app
-        Env._init_envs_(env_file_path='.env')
-        cls.app_process = multiprocessing.Process(
-            target=cls.app.run, 
-            kwargs={'host': Env.TEST_HOST, 'port': Env.TEST_PORT, 'debug': False}
-        )
-        cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
+        cls._setUpClass()
         crs = cls.db_connection.cursor()
         cls.setup_table_records(cursor=crs)
         cls.db_connection.commit()
 
-        cls.db_connection.row_factory = lambda cursor, row: {
-            k: v for k, v in zip([c[0] for c in cursor.description], row)
-        }
-        cls.app_process.daemon = True
-        cls.app_process.start()
-        cls.host = f'http://{Env.TEST_HOST}:{Env.TEST_PORT}'
-        time.sleep(.2)
 
     @classmethod
     def setup_table_records(cls, cursor):
@@ -300,20 +265,113 @@ class TestDeleteNode(unittest.TestCase):
         )
         return cursor.fetchone()
 
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls._tearDownClass()
+
+
+class TestUpdateNode(unittest.TestCase, BaseAPITest):
+    rows_to_setup = [
+        ("eid-test-0001", "delete me 0", "hello", None, None, None),
+        ("eid-test-0002", "delete me 1", "okay", None, None, None),
+        ("eid-test-0003", "delete me 2", "", None, None, None),
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls._setUpClass()
+        crs = cls.db_connection.cursor()
+        cls.setup_table_records(cursor=crs)
+        cls.db_connection.commit()
+
+    @classmethod
+    def setup_table_records(cls, cursor):
+        cursor.executemany(
+            f"INSERT INTO {Env.NODE_TABLE_NAME} VALUES (?, ?, ?, ?, ?, ?);", cls.rows_to_setup
+        )
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.executemany(
+            f"DELETE FROM {Env.NODE_TABLE_NAME} WHERE eid = (?);", 
+            list(
+                filter(
+                    lambda r: cls.get_row(cursor, r[0]), 
+                    [(row[0],) for row in cls.rows_to_setup]
+                )
+            )
+        )
+
     @staticmethod
-    def shutup_logs():
-        import logging
-        log = logging.getLogger('werkzeug')
-        log.disabled = True
+    def get_row(cursor, eid):
+        cursor.execute(
+            f"SELECT rowid, * FROM {Env.NODE_TABLE_NAME} WHERE eid = (?);", (eid,)
+        )
+        return cursor.fetchone()
 
     @classmethod
     def tearDownClass(cls):
         cursor = cls.db_connection.cursor()
         cls.cleanup_table(cursor)
         cls.db_connection.commit()
-        cls.db_connection.close()
-        cls.app_process.terminate()
-        cls.app_process.join()
+        cls._tearDownClass()
+
+    def test_update_description_01(self):
+        row = self.rows_to_setup[0]
+        new_description01 = "newly generated one"
+        request = {
+            "description": new_description01
+        }
+        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        updated_row01 = self.get_row(self.db_connection.cursor(), row[0])
+        self.assertEqual(updated_row01['description'], new_description01)
+
+        new_description02 = "another newly generated one"
+        request = {
+            "description": new_description02
+        }
+        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        updated_row02 = self.get_row(self.db_connection.cursor(), row[0])
+        self.assertEqual(updated_row02['description'], new_description02)
+
+    def test_update_name_01(self):
+        row = self.rows_to_setup[0]
+        new_name01 = "new name number one"
+        request = {
+            "name": new_name01
+        }
+        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        updated_row01 = self.get_row(self.db_connection.cursor(), row[0])
+        self.assertEqual(updated_row01['node_name'], new_name01)
+
+        new_name02 = "new name number two"
+        request = {
+            "name": new_name02
+        }
+        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        updated_row02 = self.get_row(self.db_connection.cursor(), row[0])
+        self.assertEqual(updated_row02['node_name'], new_name02)
+
+    def test_update_parent_eid_01(self):
+        row0 = self.rows_to_setup[0]  # child
+        row1 = self.rows_to_setup[1]  # parent
+        request = {
+            "parent_eid": row1[0]
+        }
+        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
+        self.assertEqual(updated_row0['parent_eid'], row1[0])
+
+        row2 = self.rows_to_setup[2]  # parent
+        request = {
+            "parent_eid": row2[0]
+        }
+        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
+        self.assertEqual(updated_row0['parent_eid'], row2[0])
 
 
 if __name__ == '__main__':
