@@ -29,10 +29,26 @@ class NodeManager:
         if description:
             values['description'] = description
         if parent_eid:
+            if self._is_cyclic_relation(child_eid=eid, parent_eid=parent_eid):
+                raise ValueError(
+                    f"Can't connect {eid} to {parent_eid}."
+                )
             values['parent_eid'] = parent_eid
         if level is not None:
             values['level'] = level
         self.node_db_wrapper.update(eid, values=values, commit=True)
+
+    def _is_cyclic_relation(self, child_eid, parent_eid) -> bool:
+        if not (children := self.get_node_children(eid=child_eid)):
+            return False
+        children_eid = [child['eid'] for child in children]
+        return (parent_eid in children_eid) or any(
+            self._is_cyclic_relation(child_eid=eid, parent_eid=parent_eid)
+            for eid in children_eid
+        )
+
+    def get_node_children(self, eid):
+        return self.node_db_wrapper.filter(values={"parent_eid":eid})
 
     def __del__(self):
         self.node_db_wrapper.__del__()

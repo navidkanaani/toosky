@@ -272,6 +272,38 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Update Node",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"not empty\",\n    \"parent_eid\": \"7e4cdb4e7760ae458a58901f0392b99eda879778c7e8387582ffba076adfdefd\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5151/node/1b7e1361ab193f1c2845c5cfe64ac98dc1426270112405e4bf000bfc9652e4c1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5151",
+					"path": [
+						"node",
+						"1b7e1361ab193f1c2845c5cfe64ac98dc1426270112405e4bf000bfc9652e4c1"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
