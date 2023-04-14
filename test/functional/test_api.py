@@ -315,6 +315,56 @@ class TestDeleteNode(unittest.TestCase):
         cls.app_process.terminate()
         cls.app_process.join()
 
+        
+class TestCreateRule(unittest.TestCase): 
+    garbage_eids = []
+    @classmethod
+    def setUpClass(cls):
+        cls.app = app
+        Env._init_envs_(env_file_path=".env")
+        cls.app_process = multiprocessing.Process(target=cls.app.run, kwargs={"host": Env.TEST_HOST,
+                                                                              "port": Env.TEST_PORT,
+                                                                              "debug": False})
+        cls.db_connection = sqlite3.connect(Env.TEST_DB_NAME)
+        cls.db_connection.row_factory = lambda cursor, row: {k: v for k, v in zip([c[0] for c in cursor.description], row)}
+        cls.app_process.daemon = True
+        cls.app_process.start()
+        cls.host = f"http://{Env.TEST_HOST}:{Env.TEST_PORT}"
+        time.sleep(.2)
+        
+    @staticmethod
+    def disable_logs():
+        import logging
+        log = logging.getLogger("werkzeug")
+        log.disabled = True
+    
+    def test_create_rule_01(self):
+        import json
+        request = {
+            "name": "Rule one"
+        }
+        response = requests.post(f"{self.host}/rule", json=request)
+        eid = response.json()["eid"]
+        rule_entity = self.retrieve_rule(eid=eid)
+        self.assertEqual(rule_entity["eid"], eid)
+        
+    def retrieve_rule(self, eid):
+        cursor = self.db_connection.cursor()
+        row = cursor.execute(f"SELECT * FROM {Env.RULE_TABLE_NAME} WHERE eid = (?)", (eid, ))
+        return row
+    
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls.db_connection.close()
+        cls.app_process.terminate()
+        cls.app_process.join()
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.executemany(f"DELETE FROM {Env.RULE_TABLE_NAME} WHERE eid = (?)", [(eid, ) for eid in cls.garbage_eids])
 
 if __name__ == '__main__':
     unittest.main()
