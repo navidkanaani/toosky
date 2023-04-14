@@ -67,9 +67,8 @@ def create_rule():
     body = request.get_json()
     rule_name = body["name"]
     rule_eid = Manager().create_rule(name=rule_name)
-    return Response(f"rule_eid: {rule_eid}", status=200, mimetype="application/json")
+    return Response(f'{{"rule_eid": "{rule_eid}"}}'.encode(), status=200, mimetype="application/json")
     
-
 @gaurd_edge
 @app.route("/rules/<eid>", methods=["GET"])
 def get_rule(eid: str):
