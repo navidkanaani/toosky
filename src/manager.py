@@ -22,8 +22,7 @@ class Manager:
         self.node_manager.update(
             eid=eid, name=name, 
             description=description, 
-            parent_eid=parent_eid,
-            level=None
+            parent_eid=parent_eid
         )
 
     def __del__(self):

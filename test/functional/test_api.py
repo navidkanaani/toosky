@@ -275,9 +275,9 @@ class TestDeleteNode(unittest.TestCase, BaseAPITest):
 
 class TestUpdateNode(unittest.TestCase, BaseAPITest):
     rows_to_setup = [
-        ("eid-test-0001", "delete me 0", "hello", None, None, None),
-        ("eid-test-0002", "delete me 1", "okay", None, None, None),
-        ("eid-test-0003", "delete me 2", "", None, None, None),
+        ("eid-test-0001", "delete me 0", "hello", None, None, 0),
+        ("eid-test-0002", "delete me 1", "okay", None, None, 0),
+        ("eid-test-0003", "delete me 2", "", None, None, 0),
     ]
 
     @classmethod
@@ -372,6 +372,27 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
         updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
         self.assertEqual(updated_row0['parent_eid'], row2[0])
+
+
+    def test_update_parent_eid_02(self):
+        row0 = self.rows_to_setup[0]  # child
+        row1 = self.rows_to_setup[1]  # parent
+        request = {
+            "parent_eid": row1[0]
+        }
+        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
+        self.assertEqual(updated_row0['parent_eid'], row1[0])
+        self.assertEqual(updated_row0['level'], 1)
+
+        row2 = self.rows_to_setup[2]  # parent
+        request = {
+            "parent_eid": row2[0]
+        }
+        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
+        self.assertEqual(updated_row0['parent_eid'], row2[0])
+        self.assertEqual(updated_row0['level'], 1)
 
 
 if __name__ == '__main__':
