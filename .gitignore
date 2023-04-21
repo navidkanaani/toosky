@@ -128,4 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-vvv
+# db
+*.db
+
+# xml
+*.idea
