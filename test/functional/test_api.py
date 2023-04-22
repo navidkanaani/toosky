@@ -49,17 +49,10 @@ class TestPingAPI(unittest.TestCase, BaseAPITest):
     def setUpClass(cls):
         cls._setUpClass()
 
-    @staticmethod
-    def shutup_logs():
-        import logging
-        log = logging.getLogger('werkzeug')
-        log.disabled = True
-
     def test_ping_01(self):
         response = requests.get(f'{self.host}/ping')
         self.assertEqual(response.json()['content'], 'pong')
         self.assertEqual(response.status_code, 200)
-
 
     @classmethod
     def tearDownClass(cls):
@@ -164,7 +157,7 @@ class TestGetNode(unittest.TestCase, BaseAPITest):
 
     def test_get_node_01(self):
         row = self.rows_to_setup[0]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/nodes/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -172,7 +165,7 @@ class TestGetNode(unittest.TestCase, BaseAPITest):
 
     def test_get_node_02(self):
         row = self.rows_to_setup[1]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/nodes/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -180,7 +173,7 @@ class TestGetNode(unittest.TestCase, BaseAPITest):
 
     def test_get_node_03(self):
         row = self.rows_to_setup[2]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/nodes/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -232,17 +225,17 @@ class TestDeleteNode(unittest.TestCase, BaseAPITest):
 
     def test_delete_node_01(self):
         row = self.rows_to_setup[0]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/nodes/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
     def test_delete_node_02(self):
         row = self.rows_to_setup[1]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/nodes/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
     def test_delete_node_03(self):
         row = self.rows_to_setup[2]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/nodes/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
 
@@ -325,7 +318,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "description": new_description01
         }
-        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row[0]}', json=request)
         updated_row01 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row01['description'], new_description01)
 
@@ -333,7 +326,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "description": new_description02
         }
-        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row[0]}', json=request)
         updated_row02 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row02['description'], new_description02)
 
@@ -343,7 +336,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "name": new_name01
         }
-        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row[0]}', json=request)
         updated_row01 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row01['node_name'], new_name01)
 
@@ -351,7 +344,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "name": new_name02
         }
-        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row[0]}', json=request)
         updated_row02 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row02['node_name'], new_name02)
 
@@ -361,7 +354,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "parent_eid": row1[0]
         }
-        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row0[0]}', json=request)
         updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
         self.assertEqual(updated_row0['parent_eid'], row1[0])
 
@@ -369,7 +362,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "parent_eid": row2[0]
         }
-        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row0[0]}', json=request)
         updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
         self.assertEqual(updated_row0['parent_eid'], row2[0])
 
