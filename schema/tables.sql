@@ -21,16 +21,16 @@ CREATE TABLE IF NOT EXISTS FilterTable (
     threshold_type INTEGER CHECK(threshold_type in (0, 1)),
     threshold_value INTEGER,
 
-    rule_id INTEGER NOT NULL,
+    rule_eid INTEGER NOT NULL,
     
-    FOREIGN KEY (rule_id) REFERENCES RuleTable(rowid)
+    FOREIGN KEY (rule_eid) REFERENCES RuleTable(eid)
 );
 
 CREATE TABLE IF NOT EXISTS WordTable (
     eid VARCHAR(31) NOT NULL UNIQUE,
     word VARCHAR(255) NOT NULL,
-    filter_id INTEGER,
-    FOREIGN KEY (filter_id) REFERENCES FilterTable(rowid)
+    filter_eid INTEGER,
+    FOREIGN KEY (filter_eid) REFERENCES FilterTable(eid)
 );
 
 CREATE TABLE IF NOT EXISTS RuleTable (

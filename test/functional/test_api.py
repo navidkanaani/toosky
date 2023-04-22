@@ -49,17 +49,10 @@ class TestPingAPI(unittest.TestCase, BaseAPITest):
     def setUpClass(cls):
         cls._setUpClass()
 
-    @staticmethod
-    def shutup_logs():
-        import logging
-        log = logging.getLogger('werkzeug')
-        log.disabled = True
-
     def test_ping_01(self):
         response = requests.get(f'{self.host}/ping')
         self.assertEqual(response.json()['content'], 'pong')
         self.assertEqual(response.status_code, 200)
-
 
     @classmethod
     def tearDownClass(cls):
@@ -164,7 +157,7 @@ class TestGetNode(unittest.TestCase, BaseAPITest):
 
     def test_get_node_01(self):
         row = self.rows_to_setup[0]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/nodes/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -172,7 +165,7 @@ class TestGetNode(unittest.TestCase, BaseAPITest):
 
     def test_get_node_02(self):
         row = self.rows_to_setup[1]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/nodes/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -180,7 +173,7 @@ class TestGetNode(unittest.TestCase, BaseAPITest):
 
     def test_get_node_03(self):
         row = self.rows_to_setup[2]
-        response = requests.get(f'{self.host}/node/{row[0]}')
+        response = requests.get(f'{self.host}/nodes/{row[0]}')
         node = response.json()["node"]
         self.assertEqual(node["eid"], row[0])
         self.assertEqual(node["node_name"], row[1])
@@ -232,17 +225,17 @@ class TestDeleteNode(unittest.TestCase, BaseAPITest):
 
     def test_delete_node_01(self):
         row = self.rows_to_setup[0]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/nodes/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
     def test_delete_node_02(self):
         row = self.rows_to_setup[1]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/nodes/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
     def test_delete_node_03(self):
         row = self.rows_to_setup[2]
-        response = requests.delete(f'{self.host}/node/{row[0]}')
+        response = requests.delete(f'{self.host}/nodes/{row[0]}')
         self.assertIsNone(self.get_row(self.db_connection.cursor(), row[0]))
 
 
@@ -325,7 +318,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "description": new_description01
         }
-        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row[0]}', json=request)
         updated_row01 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row01['description'], new_description01)
 
@@ -333,7 +326,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "description": new_description02
         }
-        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row[0]}', json=request)
         updated_row02 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row02['description'], new_description02)
 
@@ -343,7 +336,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "name": new_name01
         }
-        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row[0]}', json=request)
         updated_row01 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row01['node_name'], new_name01)
 
@@ -351,7 +344,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "name": new_name02
         }
-        response = requests.put(f'{self.host}/node/{row[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row[0]}', json=request)
         updated_row02 = self.get_row(self.db_connection.cursor(), row[0])
         self.assertEqual(updated_row02['node_name'], new_name02)
 
@@ -361,7 +354,7 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "parent_eid": row1[0]
         }
-        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row0[0]}', json=request)
         updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
         self.assertEqual(updated_row0['parent_eid'], row1[0])
 
@@ -369,10 +362,256 @@ class TestUpdateNode(unittest.TestCase, BaseAPITest):
         request = {
             "parent_eid": row2[0]
         }
-        response = requests.put(f'{self.host}/node/{row0[0]}', json=request)
+        response = requests.put(f'{self.host}/nodes/{row0[0]}', json=request)
         updated_row0 = self.get_row(self.db_connection.cursor(), row0[0])
         self.assertEqual(updated_row0['parent_eid'], row2[0])
 
+
+class TestCreateRule(unittest.TestCase, BaseAPITest): 
+    garbage_eids = []
+    @classmethod
+    def setUpClass(cls):
+        cls._setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls._tearDownClass()
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.executemany(f"DELETE FROM {Env.RULE_TABLE_NAME} WHERE eid = (?)", [(eid, ) for eid in cls.garbage_eids])
+
+    def test_create_rule_01(self):
+        import json
+        request = {
+            "name": "Rule one"
+        }
+        response = requests.post(f"{self.host}/rule", json=request)
+        eid = response.json()["rule_eid"]
+        self.garbage_eids.append(eid)
+        rule_entity = self.retrieve_rule(eid=eid)
+        self.assertEqual(rule_entity["eid"], eid)
+
+    def test_create_rule_02(self):
+        import json
+        request = {
+            "name": "Rule Two"
+        }
+        response = requests.post(f"{self.host}/rule", json=request)
+        eid = response.json()["rule_eid"]
+        self.garbage_eids.append(eid)
+        rule_entity = self.retrieve_rule(eid=eid)
+        self.assertEqual(rule_entity["eid"], eid)
+
+    def retrieve_rule(self, eid):
+        cursor = self.db_connection.cursor()
+        cursor.execute(f"SELECT rowid, * FROM {Env.RULE_TABLE_NAME} WHERE eid = (?)", (eid, ))
+        return cursor.fetchone()
+
+
+class TestGetRule(unittest.TestCase, BaseAPITest):
+    rule_samples = [
+        ("eid_rule_sample_1", "Rule One", ),
+        ("eid_rule_sample_2", "Rule Two", ),
+        ("eid_rule_sample_3", "Rule Three", )
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls._setUpClass()
+        cursor = cls.db_connection.cursor()
+        cls.insert_rule_sample(cursor)
+        cls.db_connection.commit()
+
+    @classmethod
+    def insert_rule_sample(cls, cursor):
+        cursor.executemany(f"INSERT INTO {Env.RULE_TABLE_NAME} VALUES (?, ?)", cls.rule_samples)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls._tearDownClass()
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.executemany(f"DELETE FROM {Env.RULE_TABLE_NAME} WHERE eid = (?)", [(eid, ) for eid, _ in cls.rule_samples])
+
+    def test_get_rule_01(self):
+        import json
+        rule_eid = self.rule_samples[0][0]
+        response = requests.get(f"{self.host}/rules/{rule_eid}").json()
+        self.assertEqual(response["eid"], rule_eid)
+
+    def test_get_rule_02(self):
+        import json
+        rule_eid = self.rule_samples[1][0]
+        response = requests.get(f"{self.host}/rules/{rule_eid}").json()
+        self.assertEqual(response["eid"], rule_eid)                
+
+    def test_get_rule_03(self):
+        import json
+        rule_eid = self.rule_samples[2][0]
+        response = requests.get(f"{self.host}/rules/{rule_eid}").json()
+        self.assertEqual(response["eid"], rule_eid)
+
+
+class TestListRules(unittest.TestCase, BaseAPITest):
+    rule_samples = [
+        ("eid_rule_sample_1", "Rule One", ),
+        ("eid_rule_sample_2", "Rule Two", ),
+        ("eid_rule_sample_3", "Rule Three", ),
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls._setUpClass()
+        cursor = cls.db_connection.cursor()
+        cls.insert_rule_samples(cursor)
+        cls.db_connection.commit()
+
+    @classmethod
+    def insert_rule_samples(cls, cursor):
+        cursor.executemany(f"INSERT INTO {Env.RULE_TABLE_NAME} VALUES (?, ?)", cls.rule_samples)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls._tearDownClass()
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.execute(f"DELETE FROM {Env.RULE_TABLE_NAME}")
+
+    def test_list_rules(self):
+        response = requests.get(f"{self.host}/rules").json()
+        existed_eid = {rule["eid"] for rule in response}
+        inserted_eid = {eid for eid, _ in self.rule_samples}
+        self.assertEqual(existed_eid, inserted_eid) 
+
+class TestUpdateRule(unittest.TestCase, BaseAPITest):
+    rule_samples = [
+        ("eid_rule_sample_1", "Rule One", ),
+        ("eid_rule_sample_2", "Rule Two", ),
+        ("eid_rule_sample_3", "Rule Three", ),
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls._setUpClass()
+        cursor = cls.db_connection.cursor()
+        cls.insert_rule_samples(cursor)
+        cls.db_connection.commit()
+
+    @classmethod
+    def insert_rule_samples(cls, cursor):
+        cursor.executemany(f"INSERT INTO {Env.RULE_TABLE_NAME} VALUES (?, ?)", cls.rule_samples)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls._tearDownClass()
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.execute(f"DELETE FROM {Env.RULE_TABLE_NAME}")
+
+    def test_update_rule_name_01(self):
+        import json
+        rule_eid = "eid_rule_sample_1"
+        request = {
+            "name": "Rule One One"
+        }
+        reponse = requests.put(f"{self.host}/rules/{rule_eid}", json=request)
+        rule = self.retrieve_rule(rule_eid)
+        self.assertEqual(rule["rule_name"], request["name"])
+
+
+    def test_udpate_rule_name_02(self):
+        import json
+        rule_eid = "eid_rule_sample_2"
+        request = {
+            "name": "Rule Twotwo"
+        }
+        response = requests.put(f"{self.host}/rules/{rule_eid}", json=request)
+        rule = self.retrieve_rule(rule_eid)
+        self.assertEqual(rule["rule_name"], request["name"])
+
+    def test_udpate_rule_name_03(self):
+        import json
+        rule_eid = "eid_rule_sample_3"
+        request = {
+            "name": "Rule Threethree"
+        }
+        response = requests.put(f"{self.host}/rules/{rule_eid}", json=request)
+        rule = self.retrieve_rule(rule_eid)
+        self.assertEqual(rule["rule_name"], request["name"])
+
+    def retrieve_rule(self, eid):
+        cursor = self.db_connection.cursor()
+        cursor.execute(f"SELECT rowid, * FROM {Env.RULE_TABLE_NAME} WHERE eid = (?)", (eid, ))
+        return cursor.fetchone()
+
+
+class TestDeleteRule(unittest.TestCase, BaseAPITest):
+    rule_samples = [
+        ("eid_rule_sample_1", "Rule One", ),
+        ("eid_rule_sample_2", "Rule Two", ),
+        ("eid_rule_sample_3", "Rule Three", ),
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        cls._setUpClass()
+        cursor = cls.db_connection.cursor()
+        cls.insert_rule_samples(cursor)
+        cls.db_connection.commit()
+
+    @classmethod
+    def insert_rule_samples(cls, cursor):
+        cursor.executemany(f"INSERT INTO {Env.RULE_TABLE_NAME} VALUES (?, ?)", cls.rule_samples)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = cls.db_connection.cursor()
+        cls.cleanup_table(cursor)
+        cls.db_connection.commit()
+        cls._tearDownClass()
+
+    @classmethod
+    def cleanup_table(cls, cursor):
+        cursor.execute(f"DELETE FROM {Env.RULE_TABLE_NAME}")
+
+    def test_delete_rule_01(self):
+        rule_eid = "eid_rule_sample_1"
+        requests.delete(f"{self.host}/rules/{rule_eid}")
+        rule = self.retrieve_rule(rule_eid)
+        self.assertIsNone(rule)
+
+    def test_delete_rule_02(self):
+        rule_eid = "eid_rule_sample_2"
+        requests.delete(f"{self.host}/rules/{rule_eid}")
+        rule = self.retrieve_rule(rule_eid)
+        self.assertIsNone(rule)
+
+    def test_delete_rule_03(self):
+        rule_eid = "eid_rule_sample_3"
+        requests.delete(f"{self.host}/rules/{rule_eid}")
+        rule = self.retrieve_rule(rule_eid)
+        self.assertIsNone(rule)
+
+    def retrieve_rule(self, eid):
+        cursor = self.db_connection.cursor()
+        cursor.execute(f"SELECT rowid, * FROM {Env.RULE_TABLE_NAME} WHERE eid = (?)", (eid, ))
+        return cursor.fetchone()
 
 if __name__ == '__main__':
     unittest.main()
