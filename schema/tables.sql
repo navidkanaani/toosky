@@ -23,14 +23,14 @@ CREATE TABLE IF NOT EXISTS FilterTable (
 
     rule_eid INTEGER NOT NULL,
     
-    FOREIGN KEY (rule_eid) REFERENCES RuleTable(rowid)
+    FOREIGN KEY (rule_eid) REFERENCES RuleTable(eid)
 );
 
 CREATE TABLE IF NOT EXISTS WordTable (
     eid VARCHAR(31) NOT NULL UNIQUE,
     word VARCHAR(255) NOT NULL,
     filter_eid INTEGER,
-    FOREIGN KEY (filter_eid) REFERENCES FilterTable(rowid)
+    FOREIGN KEY (filter_eid) REFERENCES FilterTable(eid)
 );
 
 CREATE TABLE IF NOT EXISTS RuleTable (
